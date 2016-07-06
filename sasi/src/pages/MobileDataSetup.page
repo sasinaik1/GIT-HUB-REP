@@ -1,0 +1,645 @@
+<apex:page controller="MobileDataSetup" action="{!pageLoad}" sidebar="false" docType="html-5.0" id="mobileDataSetupPage" tabStyle="Mobile_Data_Setup__tab">
+    <!-- BOOTSTRAP STATIC RESOURCE REFERENCES FOR STYLING -->
+    <link href="{!URLFOR($Resource.bootStrap, 'bootstrap/css/bootstrap.min.css')}" rel="stylesheet" media="screen"/>
+    <apex:includeScript value="{!URLFOR($Resource.bootStrap, 'js/bootstrap.min.js')}"/>
+    <style type="text/css">
+    <!-- Remove the TD Border where ever necessary -->
+    td.noborderTd{
+        border-top-width: 0px;        
+    }  
+    
+    .frameBorder{
+        border-top-width: 15px;
+        border-left-width: 15px;
+        border-right-width: 15px;
+        border-bottom-width: 15px;
+        border-color: lightgrey;
+    }
+    
+    .headingCustomStyle{
+        background-color:white;
+    }  
+    <!-- Loading Icon -->
+    .overlay {
+            display: none;
+            height: 100%;
+            left: 0;
+            position: fixed;
+            top: 0;
+            opacity: 0.3;
+            -moz-opacity: 0.3;
+            width: 100%;
+            //-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+            //filter: alpha(opacity=30);
+            background: #000;
+            -khtml-opacity: 0.3;
+            z-index: 1000;
+        }
+        .loader {
+            background: url("/img/loading32.gif") scroll no-repeat 0 0;
+            width: 32px;
+            height: 32px;
+            position: absolute;
+            left: 50%;
+        }
+    </style>
+    <apex:form styleclass="form-search" id="form">
+        <font style="color: red; font-weight: strong;font-size: 10pt;"></font>        
+        <apex:outputPanel id="btnTab" rendered="{!!showFields}">
+            <apex:pagemessages id="pgmsg"/>
+            <table class="table table-striped table-hover" style="font-family:verdana;font-size:12px;" border='0'>
+                <tr style="background-color: white;">
+                    <td class="noborderTd" colspan="8" style="background-color: white;">
+                        <h5 class="headingCustomStyle">Mobile Buttons</h5>
+                    </td>
+                </tr>
+                <tr class="info">
+                    <td>
+                        <i class="icon-large icon-plus-sign" onclick="showHideNewMobileButton();" title="Add New Button"></i>
+                    </td>
+                    <td>Mobile Button</td>
+                    <td>
+                        <abbr title="Show/Hide the Button on Mobile View">Active </abbr>
+                    </td>
+                    <td >
+                        <abbr title="Can Edit Records on Mobile View">Editable </abbr>
+                    </td>
+                    <td >
+                        <abbr title="Can Add New Records from Mobile View">New Enabled </abbr>
+                    </td>
+                    <td>                            
+                            <abbr title="Arrange Order of Buttons on Mobile View">Button Order </abbr>
+                            &nbsp;                            
+                            
+                        <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" onclick="funUpdateMobileButtons();" title="Save Sort"/>
+                    </td>
+                    <td colspan="3" style="text-align:center;">
+                        <abbr title="Perform Edit,Delete,Go to Fields">Actions</abbr>
+                    </td>
+                </tr>
+                <apex:variable var="i" value="{!-1}"/>
+                <apex:repeat value="{!mobileButtons}" var="mb" id="btnRpt">
+                    <apex:variable var="i" value="{!i+1}"/>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <apex:outputtext value="{!mb.Name}"/>
+                        </td>
+                        <td>
+                            <apex:inputfield value="{!mb.IsActive__c}"  onchange="unCheckonBtn(this.id,'{!i}');;funUpdateMobileButtons();" id="btnIsAct"/>
+                        </td>
+                        <td>
+                            <apex:inputfield value="{!mb.IsEditable__c}" onchange="funUpdateMobileButtons();" id="btnIsEdt" styleclass="btnAct"/>
+                        </td>
+                        <td>
+                            <apex:inputfield value="{!mb.IsNewEnabled__c}" onchange="funUpdateMobileButtons();" id="btnIsNew" styleclass="btnAct"/>
+                        </td>
+                        <td align="center">
+                            <apex:inputfield value="{!mb.SortOrder__c}" id="sortOrder" style="width: 50px;"/>
+                        </td>
+                        <td style="text-align:center;">
+                            <i class="icon-large icon-edit" onclick="showHideMobileButtoDetails('{!mb.Id}');" title="Edit"></i>
+                        </td>
+                        <td style="text-align:center;">
+                            <apex:commandlink value="" action="{!deleteMobileButton}" title="Delete" immediate="true" onclick="if(!confirm('Are you sure?')){return};" oncomplete="reloadFrameOnBtn();hideNewButtonForm();" rerender="btnTab">
+                                <apex:param name="rId" value="{!mb.Id}" assignTo="{!mobileButtonId}"/>
+                                <i class="icon-large icon-trash"></i>
+                            </apex:commandlink>
+                        </td>
+                        <td>
+                            <apex:commandlink value="" action="{!showFieldsPanel}" title="{!mb.Name}-Fields" rendered="{!mb.IsActive__c}" immediate="true" onclick="startLoading();">
+                                <apex:param name="rId" value="{!mb.Id}" assignTo="{!mobileButtonId}"/>                                
+                                <i class="icon-large icon-chevron-right"></i>
+                            </apex:commandlink>
+                            <apex:commandlink value=""  title="{!mb.Name}-Fields-Make this Button Active to edit Fields" rendered="{!!mb.IsActive__c}">
+                                <i class="icon-large icon-info-sign"></i>
+                            </apex:commandlink>
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td class="noborderTd">
+                            <i class="icon-large icon-minus-sign" onclick="showHideMobileButtoDetails('{!mb.Id}');" title="Cancel"></i>
+                        </td>
+                        <td class="noborderTd" colspan="8">
+                            <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Update Button" onclick="funUpdateMobileButtons();"/>
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td colspan="2">Name</td>
+                        <td colspan="7">
+                            <apex:inputfield value="{!mb.Name}" required="true" />
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td colspan="2">ListViewField</td>
+                        <td colspan="7">
+                            <apex:inputfield value="{!mb.ListViewField__c}" />
+                        </td>
+                    </tr>
+                    
+                    <tr Class="{!mb.id} hide warning">
+                        <td colspan="2">IconCode</td>
+                        <td colspan="7">
+                            <apex:inputfield value="{!mb.IconCode__c}" />
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td colspan="2">Button Text</td>
+                        <td colspan="7">
+                            <apex:inputfield value="{!mb.Button_Text__c}" />
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td colspan="2">Object API Name</td>
+                        <td colspan="7">
+                            <apex:inputfield value="{!mb.Object_API_Name__c}" />
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td colspan="2">SOQL Query</td>
+                        <td colspan="7">
+                            <apex:inputtextarea value="{!mb.SOQL_Query__c}" rows="8"/>
+                        </td>
+                    </tr>
+                    <tr Class="{!mb.id} hide warning">
+                        <td class="noborderTd">
+                            <i class="icon-large icon-minus-sign" onclick="showHideMobileButtoDetails('{!mb.Id}');" title="Cancel"></i>
+                        </td>
+                        <td class="noborderTd" colspan="8">
+                            <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Update Button" onclick="funUpdateMobileButtons();" />
+                        </td>
+                    </tr>
+                </apex:repeat>
+                <tr class="info">
+                    <td>
+                        <i class="icon-large icon-plus-sign" onclick="showHideNewMobileButton();" title="Add New Button"></i>
+                    </td>
+                    <td>Mobile Button</td>
+                    <td >
+                        <abbr title="Show/Hide the Button on Mobile View">Active </abbr>
+                    </td>
+                    <td >
+                        <abbr title="Can Edit Records on Mobile View">Editable </abbr>
+                    </td>
+                    <td >
+                        <abbr title="Can Add New Records from Mobile View">New Enabled </abbr>
+                    </td>
+                    <td>                        
+                            <abbr title="Arrange Order of Buttons on Mobile View">Button Order </abbr>
+                            &nbsp;
+                            
+                        <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" onclick="funUpdateMobileButtons();" title="Save Sort"/>
+                    </td>
+                    <td colspan="3" style="text-align:center;">
+                        <abbr title="Perform Edit,Delete,Go to Fields">Actions</abbr>
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td class="noborderTd">
+                        <i class="icon-large icon-minus-sign" onclick="showHideNewMobileButton();" title="Cancel"></i>
+                    </td>
+                    <td class="noborderTd" colspan="8">
+                        <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Save New Button" onclick="funCreateNewMobileButton();return false;"/>
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td colspan="2">Name</td>
+                    <td colspan="7">
+                        <apex:inputfield value="{!newMobileButton.Name}" id="Name"/>
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td colspan="2">ListViewField</td>
+                    <td colspan="7">
+                        <apex:inputfield value="{!newMobileButton.ListViewField__c}" />
+                    </td>
+                </tr>
+               
+                <tr Class="hideNew success">
+                    <td colspan="2">IconCode</td>
+                    <td colspan="7">
+                        <apex:inputfield value="{!newMobileButton.IconCode__c}" />
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td colspan="2">Button Text</td>
+                    <td colspan="7">
+                        <apex:inputfield value="{!newMobileButton.Button_Text__c}" />
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td colspan="2">Object API Name</td>
+                    <td colspan="7">
+                        <apex:inputfield value="{!newMobileButton.Object_API_Name__c}" />
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td colspan="2">SOQL Query</td>
+                    <td colspan="7">
+                        <apex:inputtextarea value="{!newMobileButton.SOQL_Query__c}" rows="8"/>
+                    </td>
+                </tr>
+                <tr Class="hideNew success">
+                    <td>
+                        <i class="icon-large icon-minus-sign" onclick="showHideNewMobileButton();" title="Cancel"></i>
+                    </td>
+                    <td class="noborderTd" colspan="8">
+                        <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Save New Button" onclick="funCreateNewMobileButton();return false;"/>
+                        <div id="txtFname"></div>
+                    </td>
+                </tr>
+            </table>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!!showFields}">
+            <td style="padding-left:50px;" valign="top" class="btnFrame">
+                <br/>
+                <p>
+                    <b class="headingCustomStyle">Mobile View </b>
+                </p>
+                <iframe src="{!$Label.MobileViewPath}" scrolling="false" id="mobBtnFrm" width="325px" height="550px" frameborder="true" class="frameBorder"/>
+            </td>
+            
+            <td valign="top">
+            <a href="/apex/MobileDataSetup_Help" title="Help for this Page (New Window)" target="__blank"><span class="helpLink">Help </span><img src="/s.gif" alt="" class="helpIcon" title=""/></a>
+        </td>
+         
+        </apex:outputPanel>
+        
+        <apex:actionFunction name="funCreateNewMobileButton" action="{!createNewMobileButton}" reRender="btnTab,pgMsg" ONComplete="reloadFrameOnBtn();showHideNewMobileButton();" status="loadStatus"/>
+        <apex:actionFunction name="funUpdateMobileButtons" action="{!updateMobileButtons}" reRender="btnTab,pgMsg" ONComplete="reloadFrameOnBtn();hideNewButtonForm();" status="loadStatus"/>
+        <apex:actionFunction name="funUpdateMobilefields" action="{!updateMobilefields}" reRender="fieldPanel,pgmsgfld" ONComplete="reloadFrame();hideNewButtonForm();" status="loadStatus"/>
+        <apex:actionFunction name="funcreateNewMobileField" action="{!createNewMobileField}" reRender="fieldPanel,pgmsgfld" ONComplete="reloadFrame();hideNewButtonForm();" status="loadStatus"/>
+        <apex:actionfunction name="backtoButtons" action="{!hideFieldsPanel}" status="loadStatus"/>
+        <apex:actionStatus onstart="startLoading();" onstop="endLoading();" id="loadStatus"/>
+        
+        <!-- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ -->
+        <div style="background-color: white;">
+            <apex:outputPanel rendered="{!showFields}" id="fieldPanel">
+                <apex:pagemessages id="pgmsgfld"/>
+                <div class="backDiv"> </div>
+                <table class="table table-striped table-hover" style="font-family:verdana;font-size:12px;" border='0'>
+                    <tr>
+                        <td class="noborderTd" colspan="5" style="background-color: white;">
+                            <h5>
+                                <!--<b>{!mobileLayouts[0].Mobile_Button_id__r.Name}-Fields</b>-->
+                                <b class="headingCustomStyle">{!map_MobileBtnId_MobileBtnName[mobilebuttonid]}-Fields</b>
+                            </h5>
+                        </td>
+                        
+                         <td style="text-align:right;background-color: white;" class="noborderTd" colspan="4">                                 
+                                <h5><apex:commandlink value="Back to Buttons" action="{!hideFieldsPanel}" title="Back to Buttons" immediate="true" onclick="startLoading();" style="color:black;">
+                                    <i class="icon-large icon-chevron-left"></i>
+                                </apex:commandlink>
+                                </h5>
+                          </td>
+                    </tr>
+                    <tr class="info">
+                        <td>
+                            <i class="icon-large icon-plus-sign" onclick="showHideNewMobileButton();" title="Add New Field"></i>
+                        </td>
+                        <td>Field Name</td>
+                        <td ><abbr title="Show/Hide the Field on Mobile View">Active</abbr></td>
+                        <td ><abbr title="Allow the field in Edit Mode">Editable</abbr></td>
+                        <td ><abbr title="Allow Visbility of Field on creating new Record">New</abbr></td>
+                        <td ><abbr title="Makes the field required on Add/Edit">Required</abbr></td>
+                        <td>                            
+                            <abbr title="Arrange Order of Buttons on Mobile View">Field Order</abbr>
+                            &nbsp;
+                            
+                            <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" onclick="funUpdateMobilefields();" title="Save Sort"/>
+                        </td>
+                        <td colspan="2" style="text-align:center;"><abbr title="Perform Edit,Delete,Go to Fields">Actions</abbr></td>
+                    </tr>
+                    <apex:variable var="j" value="{!-1}"/>
+                    <apex:repeat value="{!mobileLayouts}" var="fld" id="fldRpt">
+                        <apex:variable var="j" value="{!j+1}"/>
+                        <tr>
+                            <td></td>
+                            <td>
+                            {!fld.Field_Name__c}
+                        </td>
+                            <td>
+                                <apex:inputfield value="{!fld.IsActive__c}" onchange="unCheckonFld(this.id,{!j});funUpdateMobilefields();" id="FldIsAct"/>
+                            </td>
+                            <td>
+                                <apex:inputfield value="{!fld.IsEditField__c}" onchange="funUpdateMobilefields();" id="FldIsEdt"/>
+                            </td>
+                            <td>
+                                <apex:inputfield value="{!fld.IsNewField__c}" onchange="funUpdateMobilefields();" id="FldIsNew"/>
+                            </td>
+                            <td>
+                                <apex:inputfield value="{!fld.IsRequired__c}" onchange="funUpdateMobilefields();" id="FldIsreq"/>
+                            </td>
+                            <td>
+                                <apex:inputfield value="{!fld.Sort_Order__c}" style="width: 50px;"/>
+                            </td>
+                            <td style="text-align:center;">
+                                <i class="icon-large icon-edit" onclick="showHideFieldDetails('{!fld.Id}');" title="Edit"></i>
+                            </td>
+                            <td style="text-align:center;">
+                                <apex:commandlink value="" action="{!deleteFieled}" title="Delete" immediate="true" onclick="if(!confirm('Are you sure?')){return};" oncomplete="hideNewButtonForm();reloadFrame();" rerender="fieldPanel">
+                                    <apex:param name="rId" value="{!fld.Id}" assignTo="{!fieldId}"/>
+                                    <i class="icon-large icon-trash"></i>
+                                </apex:commandlink>
+                            </td>
+                           <!-- <td style="text-align:center;">
+                                <apex:commandlink value="" action="{!hideFieldsPanel}" title="Back to Buttons" immediate="true" onclick="startLoading();">                                    
+                                    <i class="icon-large icon-chevron-left"></i>
+                                </apex:commandlink>
+                            </td>-->
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td class="noborderTd">
+                                <i class="icon-large icon-minus-sign" onclick="showHideFieldDetails('{!fld.Id}');" title="Cancel"></i>
+                            </td>
+                            <td class="noborderTd" colspan="8">
+                                <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Update Button" onclick="funUpdateMobilefields();"/>
+                            </td>
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">Field API Name</td>
+                            <td colspan="7">
+                                <apex:inputtext value="{!fld.Field_API_Name__c}" disabled="true"/>
+                            </td>
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">Field Lable</td>
+                            <td colspan="7">
+                                <apex:inputfield value="{!fld.Field_Name__c}"/>
+                            </td>
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">Field Type</td>
+                            <td colspan="7">
+                                <apex:selectlist value="{!fld.Field_Type__c}" size="1">
+                                    <apex:selectoptions value="{!mobileDataTypes}"></apex:selectoptions>
+                                </apex:selectlist>                                
+                            </td>
+                        </tr>
+                         <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">Auto Fill Key words</td>
+                            <td colspan="7">
+                                <apex:inputfield value="{!fld.AutoFill_KeyWords__c}"/>
+                            </td>
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">List of Values</td>
+                            <td colspan="7">
+                                <apex:inputfield value="{!fld.ListOfValues__c}"/>
+                            </td>
+                        </tr>
+                       
+                        <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">WaterMark</td>
+                            <td colspan="7">
+                                <apex:inputfield value="{!fld.WaterMark__c}"/>
+                            </td>
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td colspan="2">Help Text</td>
+                            <td colspan="7">
+                                <apex:inputfield value="{!fld.HelpText__c}"/>
+                            </td>
+                        </tr>
+                        <tr Class="{!fld.id} hide warning">
+                            <td class="noborderTd">
+                                <i class="icon-large icon-minus-sign" onclick="showHideFieldDetails('{!fld.Id}');" title="Cancel"></i>
+                            </td>
+                            <td class="noborderTd" colspan="8">
+                                <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Update Button" onclick="funUpdateMobilefields();"/>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr class="info">
+                        <td>
+                            <i class="icon-large icon-plus-sign" onclick="showHideNewMobileButton();" title="Add New Field"></i>
+                        </td>
+                        <td>Field Name</td>
+                        <td ><abbr title="Show/Hide the Field on Mobile View">Active</abbr></td>
+                        <td ><abbr title="Allow the field in Edit Mode">Editable</abbr></td>
+                        <td ><abbr title="Allow Visbility of Field on creating new Record">New</abbr></td>
+                        <td ><abbr title="Makes the field required on Add/Edit">Required</abbr></td>
+                        <td>                            
+                            <abbr title="Arrange Order of Buttons on Mobile View">Field Order</abbr>
+                            &nbsp;
+                            <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" onclick="funUpdateMobilefields();" title="Save Sort"/>
+                        </td>
+                        <td colspan="3" style="text-align:center;"><abbr title="Perform Edit,Delete,Go to Fields">Actions</abbr></td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td class="noborderTd">
+                            <i class="icon-large icon-minus-sign" onclick="showHideNewMobileButton();" title="Cancel"></i>
+                        </td>
+                        <td class="noborderTd" colspan="9">
+                            <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Save New Field" onclick="funcreateNewMobileField();return false;"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="10">
+                            <apex:outputtext value="Available Fields"></apex:outputtext>&nbsp;&nbsp;                                    
+                            <apex:selectlist value="{!selectedfield}" size="1" id="availFields" styleclass="availFields">
+                                <apex:actionsupport event="onchange" action="{!autoPopulateData}" rerender="fieldPanel" oncomplete="reloadFrame();"/>
+                                <apex:selectoptions value="{!availablefields}"></apex:selectoptions>
+                            </apex:selectlist>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="10" class="noborderTd">
+                            <apex:outputtext value="{!$Label.SOQLQueryMessage}" style="color:red;font-size:14px;"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">Field API Name</td>
+                        <td colspan="8">
+                            <apex:inputtext value="{!newMobileLayout.Field_API_Name__c}" disabled="true"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">Field Lable</td>
+                        <td colspan="8">
+                            <apex:inputfield value="{!newMobileLayout.Field_Name__c}" id="lable"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">Field Type</td>
+                        <td colspan="8">
+                            <apex:selectlist value="{!newMobileLayout.Field_Type__c}" size="1">
+                                <apex:selectoptions value="{!mobileDataTypes}"></apex:selectoptions>
+                            </apex:selectlist>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">Auto Fill Key Words</td>
+                        <td colspan="8">
+                            <apex:inputfield value="{!newMobileLayout.AutoFill_KeyWords__c}"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">List of Values</td>
+                        <td colspan="8">
+                            <apex:inputfield value="{!newMobileLayout.ListOfValues__c}"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">WaterMark</td>
+                        <td colspan="8">
+                            <apex:inputfield value="{!newMobileLayout.WaterMark__c}"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td colspan="2">Help Text</td>
+                        <td colspan="8">
+                            <apex:inputfield value="{!newMobileLayout.HelpText__c}"/>
+                        </td>
+                    </tr>
+                    <tr Class="hideNew success">
+                        <td class="noborderTd">
+                            <i class="icon-large icon-minus-sign" onclick="showHideNewMobileButton();" title="Cancel"></i>
+                        </td>
+                        <td class="noborderTd" colspan="9">
+                            <apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" title="Save New Field" onclick="funcreateNewMobileField();return false;"/>
+                        </td>
+                    </tr>
+                </table>
+            </apex:outputPanel>
+        </div>
+        <td style="padding-left:50px;" valign="top" class="fldFrame">
+            <br/>
+            <apex:outputPanel rendered="{!showfields}">
+                <p>
+                    <b class="headingCustomStyle">Mobile View </b>
+                </p>
+                <iframe src="{!$Label.MobileDetailViewPath}{!mobileButtonId}" scrolling="no" id="moblayFrm" width="325px" height="550px" frameborder="true" class="frameBorder"/>
+            </apex:outputPanel>
+        </td>
+        
+        <!-- Loading Div -->
+        <div id="load_scrl" class="loadingBox loader" style="display:none"></div>
+        <div class="loadingBox overlay"></div>
+        
+        <!-- CUSTOM SCRIPTS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>        
+        $(document).ready(function(){              
+            $(".hide").hide();
+            $(".hideNew").hide();            
+            $(".noSidebarCell").css( "vertical-align", "top" );  
+            $("#toggle").hide();  
+            chkErrors();
+            if({!showfields} && $('.message').length == 0){
+                sortSelect('.availFields', 'text', 'asc');            
+            }
+            
+        });
+        
+        function hideNewButtonForm(){
+            $(".hideNew").hide();
+        }
+        function showHideMobileButtoDetails(id){
+            var idVal = '.'+id;            
+            $(idVal).fadeToggle( "slow", "linear" );
+        }
+        function showHideNewMobileButton(){
+            $(".hideNew").fadeToggle( "slow", "linear" ); 
+            try{           
+                scrollToNew();
+            }catch(err){
+                scrollToNewField();
+            }
+            try{
+                scrollToNewField();
+            }catch(err){
+                scrollToNew();
+            }
+            
+        }
+        function showHideFieldDetails(id){
+            var idVal = '.'+id;            
+            $(idVal).fadeToggle( "slow", "linear" );
+        }        
+        function reloadFrameOnBtn(){  
+            startLoading();          
+            var iframe;
+            iframe = document.getElementById('mobBtnFrm');            
+            iframe.src = iframe.src+'';
+            endLoading();
+        }
+        function reloadFrame(){ 
+            startLoading();          
+            var iframe;
+            iframe = document.getElementById('moblayFrm');            
+            iframe.src = iframe.src+'';
+            
+            endLoading();         
+        }   
+        function unCheckonBtn(val,index){            
+            var v;
+            v = val;  
+            var i ;
+            i = index;            
+            var chkd;            
+            chkd = document.getElementById('mobileDataSetupPage:form:btnRpt:'+index+':btnIsAct').checked;
+            if(!chkd){
+                document.getElementById('mobileDataSetupPage:form:btnRpt:'+index+':btnIsEdt').checked = false ;
+                document.getElementById('mobileDataSetupPage:form:btnRpt:'+index+':btnIsNew').checked = false ;
+            }
+        }
+         function unCheckonFld(val,index){            
+            var v;
+            v = val;  
+            var i ;
+            i = index;            
+            var chkd;
+            chkd = document.getElementById('mobileDataSetupPage:form:fldRpt:'+index+':FldIsAct').checked;
+            if(!chkd){
+                document.getElementById('mobileDataSetupPage:form:fldRpt:'+index+':FldIsreq').checked = false ;
+                document.getElementById('mobileDataSetupPage:form:fldRpt:'+index+':FldIsEdt').checked = false ;
+                document.getElementById('mobileDataSetupPage:form:fldRpt:'+index+':FldIsNew').checked = false ;
+            }
+            
+        }
+        function startLoading(){
+            $('#load_scrl').css('top', $(document).scrollTop() + 100);
+            $('.loadingBox').show();
+        }
+        function endLoading(){
+             $('.loadingBox').hide();
+        }
+        
+        var sortSelect = function (select, attr, order) {        
+        if(attr === 'text'){
+            if(order === 'asc'){
+                $(select).html($(select).children('option').sort(function (x, y) {
+                    return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+                }));
+                $(select).get(0).selectedIndex = 0;
+                //e.preventDefault();
+            }// end asc
+            if(order === 'desc'){
+                $(select).html($(select).children('option').sort(function (y, x) {
+                    return $(x).text().toUpperCase() < $(y).text().toUpperCase() ? -1 : 1;
+                }));
+                $(select).get(0).selectedIndex = 0;
+                //e.preventDefault();
+            }// end desc
+        }
+    
+    };
+    function chkErrors(){
+        if($('.message').length > 0 ){
+            $( '.backDiv' ).append( '<strong onclick="backtoButtons()">Back to Buttons</strong>' );
+        }else{
+        
+        }
+    } 
+    
+    function scrollToNew(){    
+        document.getElementById('mobileDataSetupPage:form:Name').focus();
+    }
+    function scrollToNewField(){    
+        document.getElementById('mobileDataSetupPage:form:lable').focus();
+    }   
+    
+    </script>
+    </apex:form>
+</apex:page>

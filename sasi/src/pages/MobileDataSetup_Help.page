@@ -1,0 +1,79 @@
+<apex:page showheader="true" sidebar="false" tabStyle="Mobile_Data_Setup__tab">
+<style type="text/css">
+    .borderless tbody tr td, .borderless tbody tr th, .borderless thead tr th {
+    border: none;
+}
+} 
+</style>
+<link href="{!URLFOR($Resource.bootStrap, 'bootstrap/css/bootstrap.min.css')}" rel="stylesheet" media="screen"/>
+<apex:includeScript value="{!URLFOR($Resource.bootStrap, 'js/bootstrap.min.js')}"/>
+<table class="table borderless" style="font-family:verdana;font-size:14px;" border='0'>
+    <tr>
+        <td colspan="2"><marquee scrollamount="5"><h4>Mobile Data setup In Salesforce</h4></marquee></td>
+    </tr>
+    <tr>
+        <td colspan="2"><h5>Step 1 - Creating Mobile Button</h5></td>
+    </tr>
+    <tr>
+        <td rowspan="4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td>From the Data Setpup Page, Click on&nbsp;<i style="background-color:cyan" class="icon-large icon-plus-sign"/> → enter Name, Listviewfield, Iconcode, Button Text, Object API Name and SOQL query.
+        Click on Save &nbsp;<apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" style="background-color:cyan"/> &nbsp;which saves a record to Mobile Button Object.</td>
+    </tr>
+    
+    <tr>
+        <td>Repeat Step 1 to Add More Mobile Buttons.</td>
+    </tr>
+    <tr>
+        <td><h6>Functional Importance of Mobile Button:</h6></td>
+    </tr>
+    <tr>
+        <td>Each Mobile Button acts as a data source for Mobile which fetches data from the respective object which is mentioned in SOQL query.</td>
+    </tr>
+    <tr>
+        <td colspan="2"><h5>Step 2 - Creating Mobile Field.</h5></td>
+    </tr>
+    <tr>
+        <td rowspan="4"></td>
+        <td>In the same page, Click on &nbsp;<i style="background-color:cyan" class="icon-large icon-chevron-right"></i>&nbsp; → Click on plus &nbsp;<i style="background-color:cyan" class="icon-large icon-plus-sign"/> → Select the desired field from the available fields dropdown → Select the "FieldType" from the drop down and save the field.</td>
+    </tr>
+    <tr>
+        <td>Repeat Step 2 to add more Mobile Fields.</td>
+    </tr>
+    <tr>
+        <td><h6>Functional Importance of Mobile Field:</h6></td>
+    </tr>
+    <tr>
+        <td>Each Mobile Field maps the data from respective Salesforce object and displays as a field in Mobile.</td>
+    </tr>
+    <tr>
+        <td colspan="2"><h5>Managing Mobile Button / Mobile Field</h5></td>
+    </tr>
+    <tr>
+        <td rowspan="7"></td>
+        <td><h6>Edit</h6></td>
+    </tr>
+    <tr>
+        <td>Click on &nbsp;<i style="background-color:cyan" class="icon-large icon-edit" title="Edit"></i>&nbsp;to edit Mobile Button / Mobile Field from the respective screen then click on &nbsp;<apex:image value="{!URLFOR($Resource.MobileView,'/img/saveIcon.png')}" width="16" height="16" style="background-color:cyan"/>&nbsp;to save the changes.</td>
+    </tr>
+    <tr>
+        <td><h6>Delete:</h6></td>
+    </tr>
+    <tr>
+        <td>Click on &nbsp;<i style="background-color:cyan" class="icon-large icon-trash"></i>&nbsp;&nbsp;to delete the Mobile Button / Mobile Field.</td>
+    </tr>
+    <tr>
+        <td colspan="9"><h5>Navigation between Mobile Button and Mobile Fields.</h5></td>
+    </tr>
+    <tr>
+        <td>Click on &nbsp;<i style="background-color:cyan" class="icon-large icon-chevron-right"></i>&nbsp; to navigate to the Mobile Fields screen from Mobile Button Screen.</td>
+    </tr>
+    <tr>
+        <td>Click on &nbsp;<i style="background-color:cyan" class="icon-large icon-chevron-left"></i>&nbsp; to navigate to the Mobile Button screen from Mobile Fields.</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+</apex:page>

@@ -1,0 +1,347 @@
+<apex:page sidebar="false" showHeader="true" showChat="false" standardStylesheets="true" controller="TreeMenuController" id="treeviewPg" tabStyle="Sprint_Planing_View__tab" title="Sprint Planning View">
+    <apex:includeScript value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/jquery.js')}"/>
+  <apex:stylesheet value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/jquery.multiselect.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/demos/assets.style.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/demos/assets.prettify.css')}"/>
+<apex:stylesheet value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/jquery-ui.css')}"/>
+<apex:includeScript value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/jquery.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/jquery-ui.min.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/demos/assets/prettify.js')}"/>
+<apex:includeScript value="{!URLFOR($Resource.AgileToolkit_MulitSelectList, '/MultiSelect/src/jquery.multiselect.js')}"/>  
+    
+  <!-- End of Javascript files -->  
+<script>
+</script><style>
+    #ccloading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    /*right: 0;*/
+    background: #000;
+    opacity: 0.9;
+    filter: alpha(opacity=80);
+}
+#img-Id{
+    position: absolute;
+    top: 40%;
+    left: 45%;
+    margin: -28px 0 0 -25px;
+    z-index: -13;
+    width: 10%;
+}
+    
+    .btn{
+        border-color:#D1D1D1 !important;/*border-width: 1px 1px 5px 1px !important;*/border-style: solid !important;
+        /* -webkit-border-radius: 11px; -moz-border-radius: 11px;border-radius: 11px !important;*/font-size:13px;
+         padding: 7px 9px 9px 8px !important; text-decoration:none; 
+         display:inline-block;
+         /*text-shadow: 1px 1px 0 rgba(255,255,255,1) !important;*/font-weight:bold; color: #242424 !important;
+         background-color: #F9F9F9; background-image: -webkit-gradient(linear, left top, left bottom, from(#F9F9F9), to(#B0B0B0)) !important;
+         background-image: -webkit-linear-gradient(top, #F9F9F9, #B0B0B0) !important;
+         background-image: -moz-linear-gradient(top, #F9F9F9, #B0B0B0) !important;
+         background-image: -ms-linear-gradient(top, #F9F9F9, #B0B0B0) !important;
+         background-image: -o-linear-gradient(top, #F9F9F9, #B0B0B0) !important;
+        /*background-image: linear-gradient(to bottom, #F9F9F9, #1ab0ec) !important;filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#F9F9F9, endColorstr=#B0B0B0)  !important;*/
+        text-shadow: 1px 1px 0 rgb(255, 255, 255);
+        margin: 0.2% !important;
+    }
+    .ui-button-text{
+    background-image: url("{!$Resource.AgileToolkit_IMG}");
+    background-repeat: no-repeat;
+}
+    
+    /*.btn:hover{
+          border-color:#B5AEA8 !important;border-width: 1px 1px 5px 1px !important;border-style: solid;
+         background-color: #1a92c2 !important; background-image: -webkit-gradient(linear, left top, left bottom, from(#3cb0fd), to(#979797)) !important;
+         background-image: -webkit-linear-gradient(top, #E0E0E0, #979797);
+         background-image: -moz-linear-gradient(top, #E0E0E0, #979797);
+         background-image: -ms-linear-gradient(top, #E0E0E0, #979797);
+         background-image: -o-linear-gradient(top, #E0E0E0, #979797);
+         background-image: linear-gradient(to bottom, #E0E0E0, #979797);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#E0E0E0, endColorstr=#979797);
+                  }*/
+</style>
+    <div id='ccloading' style='position:fixed; z-index:99999;top:0px; width:100%;color:#FFFFFF; font-size:32px;'>
+        <center><img src='{!$Resource.AgileToolkit_LoadingIMG}' id="img-Id"/>
+        </center>
+    </div>
+    
+    <apex:form id="form-Id" >
+        <apex:outputPanel id="scriptPanel">
+            <script type="text/javascript">
+            j$ = $.noConflict();
+            
+            j$(function(){
+                callBackFucntion();
+            });
+            j$(window).load(function() {
+                j$('#ccloading').hide();
+            });
+            function onChangeOfSleectList(){
+                j$('#ccloading').show();
+                dummyAF();
+                j$('#ccloading').hide();    
+            }  
+            function callBackFucntion(){
+                var clicked = false;
+                j$("select.selectOptionClass").multiselect({
+                    
+                    click: function(event, ui){
+                        var selectedDropDown=j$(this).attr('Id');
+                        if(selectedDropDown=='treeviewPg:form-Id:releases' || selectedDropDown=='treeviewPg:form-Id:milesStones'){
+                             clicked = true;
+                        }
+                    },
+                    close: function(){
+                        if(clicked){
+                            j$('#ccloading').show();
+                            dummyAF();
+                        }
+                    },
+                    checkAll: function(){
+                         var selectedDropDown=j$(this).attr('Id');
+                        if(selectedDropDown=='treeviewPg:form-Id:releases' || selectedDropDown=='treeviewPg:form-Id:milesStones'){
+                             clicked = true;
+                        }
+                       
+                    },
+                    uncheckAll: function(){
+                         var selectedDropDown=j$(this).attr('Id');
+                        if(selectedDropDown=='treeviewPg:form-Id:releases' || selectedDropDown=='treeviewPg:form-Id:milesStones'){
+                             clicked = true;
+                        }
+                    }
+                });
+            }
+            </script>    
+</apex:outputPanel> 
+        <apex:outputPanel id="refreshPanel">
+            <script>
+                j$("select").multiselect('refresh');
+            </script>
+        </apex:outputPanel>
+
+<style>
+    .multiSelectPanel td{
+        vertical-align:middle;
+    }    
+    /*body .btn {
+    background: #3498db;
+    background-image: -webkit-linear-gradient(top, #1797C0, #1797C0);
+    background-image: -moz-linear-gradient(top, #1797C0, ##1797C0);
+    background-image: -ms-linear-gradient(top, #1797C0, #1797C0);
+    background-image: -o-linear-gradient(top, #1797C0, #1797C0);
+    background-image: linear-gradient(to bottom, #1797C0, #1797C0);
+    -webkit-border-radius: 28;
+    -moz-border-radius: 28;
+    border-radius: 7px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 15px;
+    padding: 5px 13px 5px 13px;
+    text-decoration: none;
+    }*/
+    
+   .btn:hover {
+    /* background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    
+    text-decoration: none;*/
+    }
+   #Filter-div{
+      background: -webkit-linear-gradient(180deg, #85DDF7 55%, #7BA0CE 97%); /* Chrome 10+, Saf5.1+ */
+      background:    -moz-linear-gradient(180deg, #85DDF7 55%, #7BA0CE 97%); /* FF3.6+ */
+      background:     -ms-linear-gradient(180deg, #85DDF7 55%, #7BA0CE 97%); /* IE10 */
+      background:      -o-linear-gradient(180deg, #85DDF7 55%, #7BA0CE 97%); /* Opera 11.10+ */
+      background:         linear-gradient(180deg, #85DDF7 55%, #7BA0CE 97%); /* W3C */
+      padding: 2% 0% 1% 0%;      
+      background: linear-gradient(180deg, #ABE6F7 55%, #8CA7CA 97%);
+      border-radius: 7px;
+      margin-top: -1.5%;
+   }
+   
+</style>
+    
+   <script> 
+ //escapes Visualforce ID for jQuery
+  function esc(myid) {
+           return '#' + myid.replace(/(:|\.)/g,'\\\\$1');
+        }
+         
+  
+    
+  //opens the dialog
+  function openDialog(dialogId){
+   j$(esc(dialogId)).dialog({title:'Filter Details', modal:true,height: 500,width:450});
+  }
+   
+  //copies value from an input to another
+  function copyHiddenFields(fromId,toId){
+   j$(esc(fromId)).val(j$(esc(toId)).val());
+  }    
+</script>
+    <apex:pageMessages id="msgs" />
+        <apex:panelGrid columns="1" width="100%" border="0"  captionStyle="top"  id="test-Id" > 
+            <apex:panelGroup id="panel-Id" >
+                <br />
+                <apex:outputPanel style="width:100%;" id="theComponent"> 
+                    <apex:actionFunction action="{!saveFilter}" name="doPostback" />
+                    <apex:actionFunction action="{!dummyRender}" name="dummyAF" reRender="theComponent" oncomplete="j$('#ccloading').hide();callBackFucntion();"/>
+                          
+                    
+                    <apex:inputHidden value="{!filterInst.Name}" id="inputHiddenSearchName"/>
+                    <apex:inputHidden value="{!hiddenTeamName}" id="inputHiddenTeamName"/>
+                    <apex:inputHidden value="{!hiddenTrainName}" id="inputHiddenTrainName"/>
+                    <apex:outputPanel id="__dialog3" style="display:none;">
+                        <apex:outputPanel >
+                            <table style="width:90%" >
+                                <tr>
+                                    <td valign="middle" style="width:10%">
+                                        <apex:outputLabel value="Name" style="font-weight: bold"></apex:outputLabel>
+                                    </td>
+                                    <td valign="middle" style="width:10%;padding-bottom: 2%;">
+                                        <apex:inputField id="inputText" value="{!filterInst.Name}" style="height: 136%;width: 95%;"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                       <td valign="middle" style="width:10%">
+                                        <apex:outputLabel value="Release Train" style="font-weight: bold"></apex:outputLabel>
+                                    </td>
+                                    <td valign="middle" style="width:10%;padding-bottom: 2%;">
+                                        <apex:inputField id="inputTrain" value="{!filterInst.Release_Train__c}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="middle" style="width:10%">
+                                        <apex:outputLabel value="Team" style="font-weight: bold"></apex:outputLabel>
+                                    </td>
+                                    <td valign="middle" style="width:10%;padding-bottom: 2%;">
+                                        <apex:inputField id="inputTeam" value="{!filterInst.Team_ViewFilter__c}" />
+                                    </td>
+                                </tr>
+                                
+                                
+                                <tr>
+                                    <td align="center" colspan = "2" style="width:10%">
+                                       <apex:commandButton onclick="copyHiddenFields('{!$Component.inputHiddenSearchName}','{!$Component.inputText}');copyHiddenFields('{!$Component.inputHiddenTeamName}','{!$Component.inputTeam}');copyHiddenFields('{!$Component.inputHiddenTrainName}','{!$Component.inputTrain}');  doPostback(); return false;"
+                                                value="Submit"/>
+                                    </td>
+                                    
+                                </tr>
+                            </table>
+                            
+                            
+                            
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    <div id="Filter-div">
+                        <div align="center" style="margin-bottom: 1%;margin-top:-1%;">
+                            <h1 style ="font-size: 15px;text-shadow: 1px 1px 0 rgb(255, 255, 255);" align="center">{!IF(LEN(filterInst.Name)>0,filterInst.Name,'Search Filters')}</h1><br/>
+                        </div>
+                        <div align="center">
+                            <apex:outputPanel id="panelToRender">
+                                <table style="width:90%" class="multiSelectPanel" id="table">
+                                    <tr>
+                                        <td valign="middle" style="width:10% ;padding-bottom: 1%;">
+                                            <apex:outputLabel value="Release" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        <td style="width:40%;padding-bottom: 1%;" id="drop-down">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedReleases}" 
+                                                             multiselect="true" id="releases" styleClass="selectOptionClass" ><!--onblur="onChangeOfSleectList();alert('calling..');"-->
+                                                <apex:selectOptions value="{!Releases}" /> 
+                                                <!--<apex:actionSupport event="onchange" />-->
+                                            </apex:selectList>  
+                                        </td>
+                                        <td valign="middle" style="width:10%;padding-bottom: 1%;">
+                                            <apex:outputLabel value="Milestone" style="font-weight: bold"></apex:outputLabel>
+                                        </td >
+                                        
+                                        <td style="width:40% ;padding-bottom: 1%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedMilesStones}" multiselect="true" id="milesStones" styleClass="selectOptionClass" disabled="{!IF(treeViewHandshakeInstanceet.selectedReleases.size>0,'false','true')}">
+                                                <apex:selectOptions value="{!milesStones}" />
+                                            </apex:selectList>
+                                        </td>
+                                        <td valign="middle" style="width:10%;padding-bottom: 1%;">
+                                            <apex:outputLabel value="Sprint" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        <td style="width:40% ;padding-bottom: 1%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedSprints}" multiselect="true" id="sprints" styleClass="selectOptionClass" disabled="{!IF(treeViewHandshakeInstanceet.selectedMilesStones.size>0,'false','true')}">
+                                                <apex:selectOptions value="{!Sprints}" /> 
+                                            </apex:selectList>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="middle" style="width:10%;padding-bottom: 1%;">
+                                            <apex:outputLabel value="Priority" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        <td style="width:40% ;padding-bottom: 1%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedPriority}" multiselect="true" id="priority" styleClass="selectOptionClass">
+                                                <apex:selectOptions value="{!priority}" /> 
+                                            </apex:selectList>
+                                        </td>
+                                        <td valign="middle" style="width:10% ;padding-bottom: 1%;">
+                                            <apex:outputLabel value="Status" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        
+                                        <td style="width:40% ;padding-bottom: 1%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedStatus}" multiselect="true" id="status" styleClass="selectOptionClass">
+                                                <apex:selectOptions value="{!status}" /> 
+                                            </apex:selectList>
+                                        </td>
+                                        
+                                        <td valign="middle" style="width:10%;padding-bottom: 1%;">
+                                            <apex:outputLabel value="Owner" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        <td style="width:40% ;padding-bottom: 1%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedOwners}" multiselect="true" id="owners" styleClass="selectOptionClass">
+                                                <apex:selectOptions value="{!owners}" /> 
+                                            </apex:selectList> 
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="middle" style="width:10% ;padding-bottom: 2%;">
+                                            <apex:outputLabel value="Release Train" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        <td style="width:40% ;padding-bottom: 2%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedStoryReleaseTrain}" multiselect="true" id="storyReleaseTrain" styleClass="selectOptionClass">
+                                                <apex:selectOptions value="{!storyReleaseTrain}" /> 
+                                            </apex:selectList>
+                                        </td>
+                                        
+                                        <td valign="middle" style="width:10%;padding-bottom: 2%;">
+                                            <apex:outputLabel value="Team" style="font-weight: bold"></apex:outputLabel>
+                                        </td>
+                                        <td style="width:40% ;padding-bottom: 2%;">
+                                            <apex:selectList value="{!treeViewHandshakeInstanceet.selectedStoryTeam}" multiselect="true" id="storyTeam" styleClass="selectOptionClass">
+                                                <apex:selectOptions value="{!storyTeam}" /> 
+                                            </apex:selectList>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </apex:outputPanel>
+                            <div  align="center" style="width:60%;margin-top:-1%;">
+                                <apex:commandButton value="Save" title="Save filter" onClick="openDialog('{!$Component.__dialog3}'); return false;"/>
+                                <apex:commandButton value="Search"  title="Search" action="{!searchWithFilter}" id="searchFilterButton"/>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </apex:outputPanel>
+                <br />
+            </apex:panelGroup>
+        <apex:panelGroup >
+            <apex:outputPanel style="width:100%"  id="treeViewPanel" rendered="{!showTreeView}">
+                <c:Agile_Sprint_Plan_Component treeviewHandShk="{!treeViewHandshakeInstanceet}" id="comp-tr"></c:Agile_Sprint_Plan_Component>   
+            </apex:outputPanel>
+            <apex:outputPanel style="width : 100%; color : gray; font-size: 16px;margin-left: 45%;" rendered="{!!showTreeView}">
+               <center> Please click on search after selecting the appropriate entries to display the results</center>
+            </apex:outputPanel> 
+        </apex:panelGroup>
+    </apex:panelGrid> 
+    </apex:form>
+
+</apex:page>

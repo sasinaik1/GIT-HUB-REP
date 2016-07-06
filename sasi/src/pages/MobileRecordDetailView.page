@@ -1,0 +1,114 @@
+<apex:page id="page" applyHtmlTag="false" applyBodyTag="false" standardStylesheets="false" docType="html-5.0" showHeader="false" controller="MobileViewController" action="{!dataForSingleRecord}">
+    <apex:form >
+        <head>
+            <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+            <!-- StyleSheets -->
+            <apex:stylesheet value="{!URLFOR($Resource.MobileView, 'libs/jquery/jquery.mobile-1.4.5.min.css')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.MobileView, 'css/font-awesome.css')}"/>
+            <apex:stylesheet value="{!themeURL}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.MobileView, 'css/Themes/energy.css')}"/>
+            <!-- Scripts -->
+            <script type="text/javascript" src="{!URLFOR($Resource.MobileView, 'libs/jquery/jquery.min.js')}"/>
+            <script type="text/javascript" src="{!URLFOR($Resource.MobileView, 'libs/jquery/jquery.mobile-1.4.5.min.js')}"/>
+            <script type="text/javascript" src="{!URLFOR($Resource.MobileView, 'libs/iscroll/jquery.plugin.pullToRefresh.js')}"/>
+            <script type="text/javascript" src="{!URLFOR($Resource.MobileView, 'libs/iscroll/iscroll.js')}"/>
+            <script type="text/javascript" src="{!URLFOR($Resource.MobileView, 'constants.js')}"/>
+            <script type="text/javascript" src="{!URLFOR($Resource.MobileView,'MobileView.js')}"/>
+        </head>
+    
+        <body>
+            <!--   view detail page     -->            
+            <section id="viewDetailsPage" data-role="page">
+                <div data-role="header" class="header" data-add-back-btn="false" data-position="fixed" data-tap-toggle="false">
+                    <span class="back-btn">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="icon-name">Back</span>
+                    </span>
+                    <div class="title">
+                        <h1 id="viewDetailsPageTitle"></h1>
+                        <h2 class="sub-title"/>
+                    </div>
+                    <span class="onlineOffline online"></span>
+                    <span class="settingsBtn" style="pointer-events: none;"></span>
+                </div>
+                <div class="scrollable">
+                    <div role="main" class="ui-content">
+                        <ul data-role="listview" id="viewDetails"></ul>
+                    </div>
+                </div>
+                <div data-role="footer" class="footer" data-position="fixed" data-id="footer" data-tap-toggle="false">
+                    <button id="viewDetailsPageEditBtn" class="cancalButton">Edit</button>
+                </div>
+            </section>
+            <!--   edit details page     -->
+            <section id="detailsPage" data-role="page">
+                <div data-role="header" class="header" data-add-back-btn="false" data-position="fixed" data-tap-toggle="false">
+                    <div class="title">
+                        <h1 id="detailsPageTitle"></h1>
+                    </div>
+                    <span class="onlineOffline online"></span>
+                    <span class="settingsBtn" style="pointer-events: none;"></span>
+                </div>
+                <div class="scrollable">
+                    <div class="updateerrordiv">
+                        <i class="fa fa-lg fa-exclamation-triangle">
+                            <span></span>
+                        </i>
+                        <i class="fa fa-lg fa-times" onclick="errorButtonClick()"></i>
+                    </div>
+                    <div role="main" class="ui-content" id="details"></div>
+                </div>
+                <div data-role="footer" class="footer" data-position="fixed" data-id="footer" data-tap-toggle="false" >                    
+                    <button class="footerButton" id="cancelBtn">Back</button>                    
+                </div>                
+            </section>
+        </body>
+        <script>
+   /**
+ * @desc Objects record click events takes into->viewPage
+ * @param listItem of the object.
+ */
+        window.onload = 
+        function listItemclickFun(listItem) {    
+            var html = [],            
+            data = '{!dataForSingleRecord}';                
+            viewinfo = JSON.parse(data);               
+            // query Mobile Layouts using javascript remoting            
+            MobileViewController.getMobileLayouts('{!$CurrentPage.parameters.moblay}',function(result,event){                
+                if (event.status) {
+                    for (var j = 0; j < result.length; j++) {
+                        html[result[j].Sort_Order__c] = fieldLabelTemplate(viewinfo.Id, result[j].Field_Name__c, viewinfo[result[j].Field_API_Name__c], result[j].Field_Type__c);
+                    }            
+                    $.mobile.changePage('#viewDetailsPage', {
+                        transition: 'slide',
+                        reverse: false
+                    });            
+                    $('#viewDetailsPageTitle').text($(listItem).text());
+                    $('#viewDetails').html(html.join('')).listview('refresh');
+                }
+            });
+            //Edit Click
+            $(document).delegate('#viewDetailsPageEditBtn', 'click', function(e) {
+            $(".errordiv, .updateerrordiv").hide();
+            var html = [];
+            // query Mobile Layouts using javascript remoting
+            MobileViewController.getMobileLayouts('{!$CurrentPage.parameters.moblay}',function(result,event){            
+                if (event.status) {
+                    for (var i = 0; i < result.length; i++) {
+                        html[result[i].Sort_Order__c] = fieldTemplate(result[i].Field_Type__c, result[i], viewinfo);                    
+                    }                
+                    $("#details").attr('data-info', $(this).attr('data-info')).html(html.join('')).trigger('create');
+                    // Set title in the view page with selected list name.
+                    $('#detailsPageTitle').text($('#viewDetailsPageTitle').text());
+                    $.mobile.changePage('#detailsPage', {
+                        transition: "slideup"
+                    });
+                }
+            });
+            e.preventDefault();
+            //hideLoading();
+        });
+        }    
+        </script>        
+    </apex:form>
+</apex:page>

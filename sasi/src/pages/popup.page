@@ -1,0 +1,19 @@
+<apex:page standardController="User">
+
+<script type="text/javascript">
+
+    window.document.onload = new function(e)
+    {
+      if({!user.Checkbox__c})
+      {        
+           confirm("Checkbox is True");
+           
+      } else if(!{!user.Checkbox__c}){
+          confirm("Checkbox is False");
+          
+      }
+    }
+
+ </script>
+
+</apex:page>
