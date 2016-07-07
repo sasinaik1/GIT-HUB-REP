@@ -3,7 +3,7 @@
     <deploymentStatus>Deployed</deploymentStatus>
     <label>my object</label>
     <nameField>
-        <label>myobject Name</label>
+        <label>my object Name</label>
         <type>Text</type>
     </nameField>
     <pluralLabel>myobjects</pluralLabel>
