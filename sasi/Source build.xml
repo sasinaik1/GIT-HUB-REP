@@ -1,6 +1,6 @@
 <project name="Sample usage of Salesforce Ant tasks" default="retrieveUnpackaged" basedir="." xmlns:sf="antlib:com.salesforce">
 
-    <property file="build.properties"/>
+    <property file="Source build.properties"/>
     <property environment="env"/>
 
     <!-- Setting default value for username, password and session id properties to empty string 
@@ -31,7 +31,7 @@
     <target name="retrieveUnpackaged">
       <mkdir dir="retrieveUnpackaged"/>
       <!-- Retrieve the contents into another directory -->
-      <sf:retrieve username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" retrieveTarget="retrieveUnpackaged" unpackaged="Source mypkg/package.xml"/>
+      <sf:retrieve username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" retrieveTarget="retrieveUnpackaged" unpackaged="Source mypkg/package.xml"/>
     </target>
 
     <!-- Retrieve all the items of a particular metadata type -->
