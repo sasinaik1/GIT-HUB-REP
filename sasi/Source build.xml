@@ -1,4 +1,4 @@
-<project name="Sample usage of Salesforce Ant tasks" default="deployCode" basedir="." xmlns:sf="antlib:com.salesforce">
+<project name="Sample usage of Salesforce Ant tasks" default="bulkRetrieve" basedir="." xmlns:sf="antlib:com.salesforce">
 
     <property file="build.properties"/>
     <property environment="env"/>
@@ -36,7 +36,7 @@
 
     <!-- Retrieve all the items of a particular metadata type -->
     <target name="bulkRetrieve">
-      <sf:bulkRetrieve username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" metadataType="${sf.metadataType}" retrieveTarget="retrieveUnpackaged"/>
+      <sf:bulkRetrieve username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" metadataType="${sf.metadataType}" retrieveTarget="Source mypkg"/>
     </target>
 
     <!-- Retrieve metadata for all the packages specified under packageNames -->
@@ -57,7 +57,7 @@
     <!-- Shows deploying code & running tests for code in directory -->
     <target name="deployCode">
       <!-- Upload the contents of the "codepkg" directory, running the tests for just 1 class -->
-      <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" testLevel="RunSpecifiedTests" deployRoot="mypkg" rollbackOnError="true">
+      <sf:deploy username="${sf.username}" password="${sf.password}" sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" testLevel="RunSpecifiedTests" rollbackOnError="true">
       	 <runTest>SampleDeployClass</runTest> 
       </sf:deploy>
     </target>
