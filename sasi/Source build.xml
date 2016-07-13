@@ -1,4 +1,4 @@
-<project name="Sample usage of Salesforce Ant tasks" default="retrieveUnpackaged" basedir="." xmlns:sf="antlib:com.salesforce">
+<project name="Sample usage of Salesforce Ant tasks" default="retrieveUnpackageds" basedir="." xmlns:sf="antlib:com.salesforce">
 
     <property file="Source build.properties"/>
     <property environment="env"/>
