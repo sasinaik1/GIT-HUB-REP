@@ -8,7 +8,7 @@ public static Account account { get; set; }
     
     }
     
-    
+    //Comments
     @RemoteAction
     global static string getAccount() {
         account = [SELECT Id, Name, Phone, Type, NumberOfEmployees 
